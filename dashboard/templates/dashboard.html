@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bouchonnage IA | SCADA Dashboard{% endblock %}
+
+{% block sidebar %}
+{% include 'component/sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="grid gap-5 pb-6">
+  {% include 'component/navbar.html' %}
+  {% include 'component/cards.html' %}
+  <div class="grid grid-cols-1 xl:grid-cols-[2.2fr_1fr] gap-4 items-start">
+    {% include 'component/charts.html' %}
+    {% include 'component/alerts.html' %}
+  </div>
+  {% include 'component/footer.html' %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/gauges.js' %}"></script>
+<script src="{% static 'js/charts.js' %}"></script>
+<script src="{% static 'js/history.js' %}"></script>
+<script src="{% static 'js/alerts.js' %}"></script>
+<script src="{% static 'js/simulation.js' %}"></script>
+<script src="{% static 'js/api.js' %}"></script>
+<script src="{% static 'js/manual.js' %}"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

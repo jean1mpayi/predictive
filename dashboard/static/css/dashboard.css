@@ -1,0 +1,8 @@
+/*
+ * dashboard.css — vide depuis la migration vers Tailwind CSS.
+ * Tous les styles sont désormais gérés par les classes utilitaires Tailwind
+ * directement dans les templates HTML et les fichiers JavaScript.
+ *
+ * Ce fichier est conservé pour compatibilité future mais n'est plus chargé
+ * dans base.html.
+ */

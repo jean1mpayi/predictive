@@ -1,0 +1,27 @@
+<section class="rounded-[1.35rem] bg-slate-900/92 border border-slate-400/15 shadow-[0_22px_50px_rgba(0,0,0,0.24)] p-5">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-[0.9rem] mb-4">
+    <div>
+      <p class="text-[0.72rem] uppercase tracking-[0.18em] text-slate-400">Realtime Trend</p>
+      <h3 class="mt-1 text-[1.1rem] font-extrabold text-slate-50">Monitoring industriel</h3>
+    </div>
+    <div>
+      <select id="chartSelector" class="px-[0.95rem] py-[0.7rem] rounded-[0.9rem] bg-slate-900/95 border border-slate-400/20 text-slate-200 focus:outline-none focus:border-cyan-400/50">
+        <option value="temperature">Temperature</option>
+        <option value="vibration">Vibration</option>
+        <option value="current">Current</option>
+        <option value="speed">Speed</option>
+        <option value="torque">Torque</option>
+        <option value="health">Health</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="relative min-h-[22rem] py-1">
+    <canvas id="mainChart" class="w-full h-full"></canvas>
+  </div>
+
+  <div class="flex flex-col sm:flex-row gap-3 mt-[0.9rem]">
+    <button id="btnStart" class="px-4 py-[0.8rem] rounded-[0.95rem] font-bold tracking-[0.02em] border border-transparent bg-gradient-to-br from-green-500/95 to-green-700/85 text-white hover:-translate-y-px hover:brightness-105 transition-all duration-200">Start simulation</button>
+    <button id="btnStop" class="px-4 py-[0.8rem] rounded-[0.95rem] font-bold tracking-[0.02em] border border-transparent bg-gradient-to-br from-red-500/95 to-red-700/85 text-white hover:-translate-y-px hover:brightness-105 transition-all duration-200">Stop simulation</button>
+  </div>
+</section>

@@ -1,0 +1,22 @@
+<section class="rounded-[1.35rem] bg-slate-900/92 border border-slate-400/15 shadow-[0_22px_50px_rgba(0,0,0,0.24)] p-5 text-white">
+  <div class="flex justify-between items-center gap-[0.9rem] mb-4">
+    <div>
+      <p class="text-[0.72rem] uppercase tracking-[0.18em] text-slate-400">Maintenance</p>
+      <h3 class="mt-1 text-[1.1rem] font-extrabold text-slate-50">Alertes &amp; historique</h3>
+    </div>
+  </div>
+
+  <div class="grid gap-4">
+    <div class="rounded-2xl border border-slate-400/10 bg-slate-950/35 overflow-hidden">
+      <div class="px-4 py-[0.85rem] border-b border-slate-400/8 text-[0.72rem] uppercase tracking-[0.14em] text-slate-400">Alertes</div>
+      <div id="alerts" class="p-4">
+        <div class="font-bold tracking-[0.04em] text-green-400">No alert</div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-400/10 bg-slate-950/35 overflow-hidden">
+      <div class="px-4 py-[0.85rem] border-b border-slate-400/8 text-[0.72rem] uppercase tracking-[0.14em] text-slate-400">Last Measurements</div>
+      <div id="history" class="p-4 min-h-[8.5rem] max-h-[14rem] overflow-auto"></div>
+    </div>
+  </div>
+</section>

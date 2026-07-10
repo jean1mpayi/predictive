@@ -1,0 +1,173 @@
+<aside class="w-full lg:w-[19rem] shrink-0 p-6 border-r border-slate-400/15 bg-gradient-to-b from-slate-900/98 to-gray-950/98 shadow-[12px_0_40px_rgba(0,0,0,0.25)]">
+  <div class="flex items-center gap-[0.9rem] pb-4 border-b border-slate-400/10 mb-4">
+    <div class="w-12 h-12 rounded-[0.9rem] grid place-items-center bg-gradient-to-br from-cyan-400/20 to-green-400/20 border border-cyan-400/35 text-slate-200 font-extrabold tracking-[0.08em]">BI</div>
+    <div>
+      <h1 class="text-[1.05rem] font-extrabold text-slate-50 m-0">Bouchonnage IA</h1>
+      <p class="text-slate-400 mt-1 text-[0.82rem]">Maintenance prédictive industrielle</p>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <span class="block text-[0.72rem] uppercase tracking-[0.16em] mb-3 text-slate-400">Navigation</span>
+    <nav class="grid gap-2">
+      <a class="px-[0.95rem] py-[0.8rem] rounded-[0.9rem] text-[#dbe4f0] bg-gradient-to-br from-cyan-400/15 to-slate-900/95 border border-cyan-400/30 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.08)] transition-all duration-200 ease-in" href="#">Vue SCADA</a>
+      <a class="px-[0.95rem] py-[0.8rem] rounded-[0.9rem] text-[#dbe4f0] border border-transparent bg-slate-900/55 hover:border-cyan-400/30 hover:bg-gradient-to-br hover:from-cyan-400/15 hover:to-slate-900/95 hover:shadow-[inset_0_0_0_1px_rgba(34,211,238,0.08)] transition-all duration-200 ease-in" href="#">Simulation</a>
+      <a class="px-[0.95rem] py-[0.8rem] rounded-[0.9rem] text-[#dbe4f0] border border-transparent bg-slate-900/55 hover:border-cyan-400/30 hover:bg-gradient-to-br hover:from-cyan-400/15 hover:to-slate-900/95 hover:shadow-[inset_0_0_0_1px_rgba(34,211,238,0.08)] transition-all duration-200 ease-in" href="#">Machine</a>
+      <a class="px-[0.95rem] py-[0.8rem] rounded-[0.9rem] text-[#dbe4f0] border border-transparent bg-slate-900/55 hover:border-cyan-400/30 hover:bg-gradient-to-br hover:from-cyan-400/15 hover:to-slate-900/95 hover:shadow-[inset_0_0_0_1px_rgba(34,211,238,0.08)] transition-all duration-200 ease-in" href="#">Alertes</a>
+      <a class="px-[0.95rem] py-[0.8rem] rounded-[0.9rem] text-[#dbe4f0] border border-transparent bg-slate-900/55 hover:border-cyan-400/30 hover:bg-gradient-to-br hover:from-cyan-400/15 hover:to-slate-900/95 hover:shadow-[inset_0_0_0_1px_rgba(34,211,238,0.08)] transition-all duration-200 ease-in" href="#">Paramètres</a>
+    </nav>
+  </div>
+
+  <div class="mt-5">
+    <span class="block text-[0.72rem] uppercase tracking-[0.16em] mb-3 text-slate-400">Fault Injection</span>
+    <div class="grid gap-3">
+      <select id="faultSelector" class="w-full px-[0.95rem] py-[0.7rem] rounded-[0.9rem] bg-slate-900/95 border border-slate-400/20 text-slate-200 focus:outline-none focus:border-cyan-400/50">
+        <option value="NORMAL">Normal</option>
+        <option value="BEARING_WEAR">Bearing Wear</option>
+        <option value="COOLING_FAILURE">Cooling Failure</option>
+        <option value="MOTOR_OVERLOAD">Motor Overload</option>
+        <option value="ROTOR_MISALIGNMENT">Rotor Misalignment</option>
+        <option value="ELECTRICAL_FAULT">Electrical Fault</option>
+        <option value="POWER_LOSS">Power Loss</option>
+      </select>
+
+      <button id="faultApplyBtn" class="px-[0.95rem] py-[0.78rem] rounded-[0.9rem] bg-gradient-to-br from-cyan-400/20 to-cyan-400/10 border border-cyan-400/30 text-sky-100 font-bold tracking-[0.03em] transition-all duration-200 hover:from-cyan-400/30 hover:to-cyan-400/15">
+        Apply fault
+      </button>
+
+      <div class="flex items-center justify-start gap-3 text-slate-400">
+        <span class="w-[0.9rem] h-[0.9rem] rounded-full bg-orange-400 shadow-[0_0_18px_rgba(251,146,60,0.45),0_0_0_4px_rgba(255,255,255,0.04)] shrink-0" id="faultLed"></span>
+        <span id="faultStatus">Fault: NORMAL</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5">
+    <span class="block text-[0.72rem] uppercase tracking-[0.16em] mb-3 text-slate-400">Réglage manuel</span>
+    <div class="rounded-2xl border border-cyan-500/10 bg-slate-950/70 p-4 shadow-lg shadow-black/20">
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <p class="text-xs uppercase tracking-[0.18em] text-slate-400">Paramètres moteur</p>
+          <h4 class="mt-1 text-sm font-semibold text-slate-100">Contrôle manuel</h4>
+        </div>
+        <span id="manualBadge" class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-200">
+          Backend connecté
+        </span>
+      </div>
+
+      <div class="space-y-4" id="manualSliders">
+
+        <label class="block">
+          <div class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-400">
+            <span>Température</span>
+            <span id="manualVal-temperature" class="font-semibold text-slate-200">40 °C</span>
+          </div>
+          <input
+            id="manualSlider-temperature"
+            data-param="temperature"
+            data-unit="°C"
+            type="range" min="0" max="130" step="0.5" value="40"
+            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-800 accent-cyan-400" />
+        </label>
+
+        <label class="block">
+          <div class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-400">
+            <span>Vibration</span>
+            <span id="manualVal-vibration" class="font-semibold text-slate-200">0.25 g</span>
+          </div>
+          <input
+            id="manualSlider-vibration"
+            data-param="vibration"
+            data-unit="g"
+            type="range" min="0" max="5" step="0.01" value="0.25"
+            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-800 accent-amber-400" />
+        </label>
+
+        <label class="block">
+          <div class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-400">
+            <span>Courant</span>
+            <span id="manualVal-current" class="font-semibold text-slate-200">7.0 A</span>
+          </div>
+          <input
+            id="manualSlider-current"
+            data-param="current"
+            data-unit="A"
+            type="range" min="0" max="30" step="0.1" value="7"
+            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-800 accent-emerald-400" />
+        </label>
+
+        <label class="block">
+          <div class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-400">
+            <span>Charge</span>
+            <span id="manualVal-load" class="font-semibold text-slate-200">40 %</span>
+          </div>
+          <input
+            id="manualSlider-load"
+            data-param="load"
+            data-unit="%"
+            type="range" min="0" max="100" step="1" value="40"
+            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-800 accent-fuchsia-400" />
+        </label>
+
+        <label class="block">
+          <div class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-400">
+            <span>Usure roulements</span>
+            <span id="manualVal-wear" class="font-semibold text-slate-200">5 %</span>
+          </div>
+          <input
+            id="manualSlider-wear"
+            data-param="wear"
+            data-unit="%"
+            type="range" min="0" max="100" step="0.5" value="5"
+            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-800 accent-rose-400" />
+        </label>
+
+        <label class="block">
+          <div class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-400">
+            <span>Désalignement</span>
+            <span id="manualVal-misalignment" class="font-semibold text-slate-200">0 %</span>
+          </div>
+          <input
+            id="manualSlider-misalignment"
+            data-param="misalignment"
+            data-unit="%"
+            type="range" min="0" max="100" step="1" value="0"
+            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-800 accent-orange-400" />
+        </label>
+
+        <label class="block">
+          <div class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-400">
+            <span>Refroidissement</span>
+            <span id="manualVal-cooling_efficiency" class="font-semibold text-slate-200">100 %</span>
+          </div>
+          <input
+            id="manualSlider-cooling_efficiency"
+            data-param="cooling_efficiency"
+            data-unit="%"
+            type="range" min="0" max="100" step="1" value="100"
+            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-800 accent-sky-400" />
+        </label>
+
+      </div>
+
+      <button
+        id="manualResetAllBtn"
+        class="mt-4 w-full py-[0.65rem] rounded-xl border border-slate-400/15 bg-slate-900/60 text-[0.75rem] uppercase tracking-[0.12em] text-slate-400 font-semibold hover:border-rose-400/30 hover:text-rose-300 transition-all duration-200">
+        ↺ Réinitialiser tout
+      </button>
+    </div>
+  </div>
+
+
+  <div class="mt-6 pt-4 border-t border-slate-400/10 grid gap-[0.8rem]">
+    <span class="block text-[0.72rem] uppercase tracking-[0.16em] mb-1 text-slate-400">Connectivité</span>
+    <div class="flex items-center justify-between gap-3 text-slate-400">
+      <span class="w-[0.9rem] h-[0.9rem] rounded-full bg-green-400 shadow-[0_0_18px_rgba(74,222,128,0.55),0_0_0_4px_rgba(255,255,255,0.04)] shrink-0"></span>
+      <span>API backend active</span>
+    </div>
+    <div class="flex items-center justify-between gap-3 text-slate-400">
+      <span class="w-[0.9rem] h-[0.9rem] rounded-full bg-cyan-400 shadow-[0_0_18px_rgba(34,211,238,0.55),0_0_0_4px_rgba(255,255,255,0.04)] shrink-0"></span>
+      <span>Dashboard Tailwind</span>
+    </div>
+  </div>
+</aside>

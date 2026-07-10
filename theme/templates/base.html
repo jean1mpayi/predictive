@@ -1,0 +1,22 @@
+{% load static tailwind_tags %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>{% block title %}Bouchonnage IA System{% endblock %}</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    {% tailwind_css %}
+    {% block extra_css %}{% endblock %}
+  </head>
+
+  <body class="bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.12),transparent_28%),radial-gradient(circle_at_right_top,rgba(74,222,128,0.08),transparent_25%),linear-gradient(180deg,#071018,#0b1724)] overflow-y-auto overflow-x-hidden text-slate-100 min-h-screen">
+    <div class="flex flex-col lg:flex-row min-h-screen items-stretch">
+      {% block sidebar %}{% endblock %}
+      <main class="flex-1 min-w-0 p-4 lg:p-6 overflow-visible">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
