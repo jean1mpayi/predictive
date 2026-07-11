@@ -30,25 +30,11 @@
         href="{% url 'dashboard' %}"
         >Vue SCADA</a
       >
-      <a
-        class="px-[0.95rem] py-[0.8rem] rounded-[0.9rem] text-slate-700 font-medium border border-transparent bg-white hover:border-cyan-200 hover:bg-cyan-50 transition-all duration-200 ease-in shadow-sm"
-        href="#"
-        >Simulation</a
-      >
-      <a
-        class="px-[0.95rem] py-[0.8rem] rounded-[0.9rem] text-slate-700 font-medium border border-transparent bg-white hover:border-cyan-200 hover:bg-cyan-50 transition-all duration-200 ease-in shadow-sm"
-        href="#"
-        >Machine</a
-      >
+
       <a
         class="px-[0.95rem] py-[0.8rem] rounded-[0.9rem] text-slate-700 font-medium border border-transparent bg-white hover:border-cyan-200 hover:bg-cyan-50 transition-all duration-200 ease-in shadow-sm"
         href="{% url 'alerts_list' %}"
         >Alertes</a
-      >
-      <a
-        class="px-[0.95rem] py-[0.8rem] rounded-[0.9rem] text-slate-700 font-medium border border-transparent bg-white hover:border-cyan-200 hover:bg-cyan-50 transition-all duration-200 ease-in shadow-sm"
-        href="#"
-        >Paramètres</a
       >
     </nav>
   </div>
@@ -96,185 +82,256 @@
       class="block text-[0.72rem] uppercase tracking-[0.16em] mb-3 text-slate-500 font-semibold"
       >Réglage manuel</span
     >
-    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div class="mb-4 flex items-center justify-between gap-3">
+    <div
+      class="rounded-[1.2rem] border border-slate-200 bg-white p-4 shadow-sm"
+    >
+      <div class="mb-4 flex items-start justify-between gap-3">
         <div>
-          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">
-            Paramètres moteur
+          <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            Panneau opérateur
           </p>
           <h4 class="mt-1 text-sm font-semibold text-slate-900">
-            Contrôle manuel
+            Contrôle du moteur
           </h4>
         </div>
         <span
           id="manualBadge"
-          class="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-700"
+          class="rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-700"
         >
-          Backend connecté
+          Connecté
         </span>
       </div>
 
-      <div class="space-y-4" id="manualSliders">
-        <label class="block">
-          <div
-            class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-500 font-medium"
+      <div class="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <div class="flex items-center justify-between gap-2">
+          <p
+            class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500"
           >
-            <span>Température</span>
-            <span id="manualVal-temperature" class="font-bold text-slate-800"
-              >40 °C</span
-            >
-          </div>
-          <input
-            id="manualSlider-temperature"
-            data-param="temperature"
-            data-unit="°C"
-            type="range"
-            min="0"
-            max="130"
-            step="0.5"
-            value="40"
-            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-cyan-500"
-          />
-        </label>
+            Mode de contrôle
+          </p>
+          <span
+            id="manualModeStatus"
+            class="text-[10px] font-semibold text-cyan-700"
+          >
+            Physique active
+          </span>
+        </div>
+        <div class="mt-2 grid grid-cols-2 gap-2">
+          <label
+            class="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50"
+          >
+            <input
+              type="radio"
+              name="manualMode"
+              id="manualModeAuto"
+              value="AUTO"
+              checked
+              class="accent-cyan-600"
+            />
+            <span>AUTO</span>
+          </label>
+          <label
+            class="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-amber-300 hover:bg-amber-50"
+          >
+            <input
+              type="radio"
+              name="manualMode"
+              id="manualModeManual"
+              value="MANUAL"
+              class="accent-amber-600"
+            />
+            <span>MANUAL</span>
+          </label>
+        </div>
+      </div>
 
-        <label class="block">
-          <div
-            class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-500 font-medium"
+      <div class="mb-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3">
+        <div class="mb-2 flex items-center justify-between">
+          <p
+            class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500"
           >
-            <span>Vibration</span>
-            <span id="manualVal-vibration" class="font-bold text-slate-800"
-              >0.25 g</span
+            Paramètres internes
+          </p>
+          <span class="text-[10px] font-medium text-slate-400"
+            >État machine</span
+          >
+        </div>
+        <div class="space-y-3" id="manualSliders">
+          <label class="block">
+            <div
+              class="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-500 font-semibold"
             >
-          </div>
-          <input
-            id="manualSlider-vibration"
-            data-param="vibration"
-            data-unit="g"
-            type="range"
-            min="0"
-            max="5"
-            step="0.01"
-            value="0.25"
-            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-amber-500"
-          />
-        </label>
+              <span>Charge</span>
+              <span id="manualVal-load" class="font-bold text-slate-800"
+                >40 %</span
+              >
+            </div>
+            <input
+              id="manualSlider-load"
+              data-param="load"
+              data-unit="%"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="40"
+              class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-fuchsia-500"
+            />
+          </label>
 
-        <label class="block">
-          <div
-            class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-500 font-medium"
-          >
-            <span>Courant</span>
-            <span id="manualVal-current" class="font-bold text-slate-800"
-              >7.0 A</span
+          <label class="block">
+            <div
+              class="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-500 font-semibold"
             >
-          </div>
-          <input
-            id="manualSlider-current"
-            data-param="current"
-            data-unit="A"
-            type="range"
-            min="0"
-            max="30"
-            step="0.1"
-            value="7"
-            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-emerald-500"
-          />
-        </label>
+              <span>Usure</span>
+              <span id="manualVal-wear" class="font-bold text-slate-800"
+                >5 %</span
+              >
+            </div>
+            <input
+              id="manualSlider-wear"
+              data-param="wear"
+              data-unit="%"
+              type="range"
+              min="0"
+              max="100"
+              step="0.5"
+              value="5"
+              class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-rose-500"
+            />
+          </label>
 
-        <label class="block">
-          <div
-            class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-500 font-medium"
-          >
-            <span>Charge</span>
-            <span id="manualVal-load" class="font-bold text-slate-800"
-              >40 %</span
+          <label class="block">
+            <div
+              class="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-500 font-semibold"
             >
-          </div>
-          <input
-            id="manualSlider-load"
-            data-param="load"
-            data-unit="%"
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            value="40"
-            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-fuchsia-500"
-          />
-        </label>
+              <span>Désalignement</span>
+              <span id="manualVal-misalignment" class="font-bold text-slate-800"
+                >0 %</span
+              >
+            </div>
+            <input
+              id="manualSlider-misalignment"
+              data-param="misalignment"
+              data-unit="%"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="0"
+              class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-orange-500"
+            />
+          </label>
 
-        <label class="block">
-          <div
-            class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-500 font-medium"
-          >
-            <span>Usure roulements</span>
-            <span id="manualVal-wear" class="font-bold text-slate-800"
-              >5 %</span
+          <label class="block">
+            <div
+              class="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-500 font-semibold"
             >
-          </div>
-          <input
-            id="manualSlider-wear"
-            data-param="wear"
-            data-unit="%"
-            type="range"
-            min="0"
-            max="100"
-            step="0.5"
-            value="5"
-            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-rose-500"
-          />
-        </label>
+              <span>Refroidissement</span>
+              <span
+                id="manualVal-cooling_efficiency"
+                class="font-bold text-slate-800"
+                >100 %</span
+              >
+            </div>
+            <input
+              id="manualSlider-cooling_efficiency"
+              data-param="cooling_efficiency"
+              data-unit="%"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value="100"
+              class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-sky-500"
+            />
+          </label>
+        </div>
+      </div>
 
-        <label class="block">
-          <div
-            class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-500 font-medium"
+      <div class="rounded-xl border border-amber-200 bg-amber-50/70 p-3">
+        <div class="mb-2 flex items-center justify-between">
+          <p
+            class="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-700"
           >
-            <span>Désalignement</span>
-            <span id="manualVal-misalignment" class="font-bold text-slate-800"
-              >0 %</span
+            Overrides manuels
+          </p>
+          <span class="text-[10px] font-medium text-amber-700"
+            >Mode MANUAL</span
+          >
+        </div>
+        <div class="space-y-3">
+          <label class="block">
+            <div
+              class="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-500 font-semibold"
             >
-          </div>
-          <input
-            id="manualSlider-misalignment"
-            data-param="misalignment"
-            data-unit="%"
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            value="0"
-            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-orange-500"
-          />
-        </label>
+              <span>Température</span>
+              <span id="manualVal-temperature" class="font-bold text-slate-800"
+                >40 °C</span
+              >
+            </div>
+            <input
+              id="manualSlider-temperature"
+              data-param="temperature"
+              data-unit="°C"
+              type="range"
+              min="0"
+              max="130"
+              step="0.5"
+              value="40"
+              class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-cyan-500"
+            />
+          </label>
 
-        <label class="block">
-          <div
-            class="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-slate-500 font-medium"
-          >
-            <span>Refroidissement</span>
-            <span
-              id="manualVal-cooling_efficiency"
-              class="font-bold text-slate-800"
-              >100 %</span
+          <label class="block">
+            <div
+              class="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-500 font-semibold"
             >
-          </div>
-          <input
-            id="manualSlider-cooling_efficiency"
-            data-param="cooling_efficiency"
-            data-unit="%"
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            value="100"
-            class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-sky-500"
-          />
-        </label>
+              <span>Vibration</span>
+              <span id="manualVal-vibration" class="font-bold text-slate-800"
+                >0.25 g</span
+              >
+            </div>
+            <input
+              id="manualSlider-vibration"
+              data-param="vibration"
+              data-unit="g"
+              type="range"
+              min="0"
+              max="5"
+              step="0.01"
+              value="0.25"
+              class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-amber-500"
+            />
+          </label>
+
+          <label class="block">
+            <div
+              class="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-500 font-semibold"
+            >
+              <span>Courant</span>
+              <span id="manualVal-current" class="font-bold text-slate-800"
+                >7.0 A</span
+              >
+            </div>
+            <input
+              id="manualSlider-current"
+              data-param="current"
+              data-unit="A"
+              type="range"
+              min="0"
+              max="30"
+              step="0.1"
+              value="7"
+              class="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-emerald-500"
+            />
+          </label>
+        </div>
       </div>
 
       <button
         id="manualResetAllBtn"
-        class="mt-4 w-full py-[0.65rem] rounded-xl border border-slate-200 bg-slate-50 text-[0.75rem] uppercase tracking-[0.12em] text-slate-600 font-bold hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition-all duration-200"
+        class="mt-4 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
       >
         ↺ Réinitialiser tout
       </button>

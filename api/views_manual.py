@@ -125,6 +125,43 @@ def manual_update(request) -> JsonResponse:
 
 
 # ---------------------------------------------------------------------------
+# /api/manual/mode/
+# ---------------------------------------------------------------------------
+
+@csrf_exempt
+@require_POST
+def manual_mode(request) -> JsonResponse:
+    """Change le mode de contrôle entre AUTO et MANUAL."""
+    try:
+        body = json.loads(request.body)
+    except (json.JSONDecodeError, ValueError) as exc:
+        return JsonResponse(
+            {"success": False, "error": f"JSON invalide : {exc}"},
+            status=400,
+        )
+
+    mode = body.get("mode", "").strip().upper()
+    if not mode:
+        return JsonResponse(
+            {"success": False, "error": "Champ 'mode' manquant."},
+            status=400,
+        )
+
+    try:
+        engine = get_engine()
+        engine.manual.set_mode(mode)
+        return JsonResponse({
+            "success": True,
+            "mode": engine.manual.mode.value,
+        })
+    except ValueError as exc:
+        return JsonResponse({"success": False, "error": str(exc)}, status=400)
+    except Exception as exc:
+        logger.exception("[API/manual] Erreur inattendue sur mode")
+        return JsonResponse({"success": False, "error": "Erreur interne du serveur."}, status=500)
+
+
+# ---------------------------------------------------------------------------
 # /api/manual/reset/
 # ---------------------------------------------------------------------------
 

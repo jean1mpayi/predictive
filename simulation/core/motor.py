@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Optional
 
 from .physics import Physics
 
@@ -37,6 +38,20 @@ class SynchronousMotor:
     vibration: float = 0.0
 
     # -----------------------------
+    # Contrôle manuel / overrides
+    # -----------------------------
+    manual_mode: str = "AUTO"
+    manual_override: dict[str, Optional[float]] = field(
+        default_factory=lambda: {
+            "temperature": None,
+            "vibration": None,
+            "current": None,
+            "speed": None,
+            "torque": None,
+        }
+    )
+
+    # -----------------------------
     # Temps de fonctionnement
     # -----------------------------
     runtime: float = 0.0
@@ -67,6 +82,15 @@ class SynchronousMotor:
         self.torque = 0.0
         self.vibration = 0.0
 
+        self.manual_mode = "AUTO"
+        self.manual_override = {
+            "temperature": None,
+            "vibration": None,
+            "current": None,
+            "speed": None,
+            "torque": None,
+        }
+
         self.runtime = 0.0
 
     # =============================
@@ -90,7 +114,8 @@ class SynchronousMotor:
             load=self.load,
             wear=self.wear,
             cooling_efficiency=self.cooling_efficiency,
-            dt=dt
+            dt=dt,
+            motor=self,
         )
 
         # Usure
@@ -102,24 +127,28 @@ class SynchronousMotor:
 
         # Vitesse
         self.speed = Physics.compute_speed(
-            self.load
+            self.load,
+            motor=self,
         )
 
         # Courant
         self.current = Physics.compute_current(
             self.load,
-            self.wear
+            self.wear,
+            motor=self,
         )
 
         # Couple
         self.torque = Physics.compute_torque(
-            self.load
+            self.load,
+            motor=self,
         )
 
         # Vibrations
         self.vibration = Physics.compute_vibration(
             self.wear,
-            self.misalignment
+            self.misalignment,
+            motor=self,
         )
 
         # Temps de fonctionnement

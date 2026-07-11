@@ -58,12 +58,28 @@ class Physics:
     # ------------------------------------------------------------------
 
     @staticmethod
+    def _resolve_override(motor, key, computed_value):
+        if motor is None:
+            return computed_value
+
+        if getattr(motor, "manual_mode", "AUTO").upper() != "MANUAL":
+            return computed_value
+
+        overrides = getattr(motor, "manual_override", {}) or {}
+        override = overrides.get(key)
+        if override is None:
+            return computed_value
+
+        return override
+
+    @staticmethod
     def compute_temperature(
         current_temp,
         load,
         wear,
         cooling_efficiency,
-        dt
+        dt,
+        motor=None,
     ):
         p = Physics.params
 
@@ -74,11 +90,12 @@ class Physics:
         )
 
         new_temp = current_temp + delta * dt
-
-        return max(
+        computed = max(
             p.ambient_temperature,
             min(new_temp, p.max_temperature)
         )
+
+        return Physics._resolve_override(motor, "temperature", computed)
 
     # ------------------------------------------------------------------
     # Usure
@@ -101,15 +118,16 @@ class Physics:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def compute_speed(load):
+    def compute_speed(load, motor=None):
         p = Physics.params
 
         speed = (
             p.nominal_speed
             - p.speed_drop_gain * load
         )
+        computed = max(speed, 0)
 
-        return max(speed, 0)
+        return Physics._resolve_override(motor, "speed", computed)
 
     # ------------------------------------------------------------------
     # Courant
@@ -118,28 +136,33 @@ class Physics:
     @staticmethod
     def compute_current(
         load,
-        wear
+        wear,
+        motor=None,
     ):
         p = Physics.params
 
-        return (
+        computed = (
             p.nominal_current
             + p.current_load_gain * load
             + p.current_wear_gain * wear
         )
+
+        return Physics._resolve_override(motor, "current", computed)
 
     # ------------------------------------------------------------------
     # Couple
     # ------------------------------------------------------------------
 
     @staticmethod
-    def compute_torque(load):
+    def compute_torque(load, motor=None):
         p = Physics.params
 
-        return (
+        computed = (
             p.nominal_torque
             + p.torque_load_gain * load
         )
+
+        return Physics._resolve_override(motor, "torque", computed)
 
     # ------------------------------------------------------------------
     # Vibrations
@@ -148,15 +171,18 @@ class Physics:
     @staticmethod
     def compute_vibration(
         wear,
-        misalignment
+        misalignment,
+        motor=None,
     ):
         p = Physics.params
 
-        return (
+        computed = (
             p.nominal_vibration
             + p.vibration_wear_gain * wear
             + p.vibration_misalignment_gain * misalignment
         )
+
+        return Physics._resolve_override(motor, "vibration", computed)
 
     # ------------------------------------------------------------------
     # Indice de santé (Health Index)

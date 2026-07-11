@@ -5,8 +5,9 @@ Tableau de bord SCADA {% endblock %} {% block extra_css %}
   type="text/css"
   href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
 />
-{% endblock %} {% block sidebar %} {% include 'component/sidebar.html' %} {%
-endblock %} {% block content %}
+{% endblock %} 
+{% block sidebar %} {% include 'component/sidebar.html' %} 
+{%endblock %} {% block content %}
 <div class="grid gap-5 pb-6">
   {% include 'component/navbar.html' %} {% include 'component/cards.html' %}
   <div class="grid grid-cols-1 xl:grid-cols-[2.2fr_1fr] gap-4 items-start">

@@ -24,6 +24,7 @@ Architecture :
 from __future__ import annotations
 
 import logging
+from enum import Enum
 from typing import TYPE_CHECKING, Any
 
 from .validators import ManualValidator
@@ -32,6 +33,11 @@ if TYPE_CHECKING:
     from simulation.core.motor import SynchronousMotor
 
 logger = logging.getLogger(__name__)
+
+
+class ControlMode(str, Enum):
+    AUTO = "AUTO"
+    MANUAL = "MANUAL"
 
 
 # Valeurs nominales par défaut — synchronisées avec motor.py
@@ -72,7 +78,32 @@ class ManualController:
             motor: Instance de SynchronousMotor à piloter.
         """
         self.motor = motor
+        self.mode = ControlMode.AUTO
         logger.info("[ManualController] Initialisé sur moteur %s", motor)
+
+    # ==================================================================
+    # MODE
+    # ==================================================================
+
+    def set_mode(self, mode: str) -> None:
+        """Passe le contrôleur en mode AUTO ou MANUAL."""
+        mode_name = mode.value if isinstance(mode, ControlMode) else str(mode)
+        self.mode = ControlMode(mode_name.upper())
+        self.motor.manual_mode = self.mode.value
+        if self.mode == ControlMode.AUTO:
+            self.clear_overrides()
+        logger.info("[ManualController] mode → %s", self.mode.value)
+
+    def is_manual(self) -> bool:
+        return self.mode == ControlMode.MANUAL
+
+    def is_auto(self) -> bool:
+        return self.mode == ControlMode.AUTO
+
+    def clear_overrides(self) -> None:
+        """Supprime tous les overrides manuels afin de reprendre le calcul physique."""
+        for key in self.motor.manual_override:
+            self.motor.manual_override[key] = None
 
     # ==================================================================
     # SET — modifications directes
@@ -86,7 +117,10 @@ class ManualController:
             value: Température en °C [0, 130].
         """
         ManualValidator.validate("temperature", value)
-        self.motor.internal_temperature = float(value)
+        if self.is_manual():
+            self.motor.manual_override["temperature"] = float(value)
+        else:
+            self.motor.internal_temperature = float(value)
         logger.debug("[ManualController] temperature → %.2f °C", value)
 
     def set_load(self, value: float) -> None:
@@ -111,7 +145,10 @@ class ManualController:
             value: Vibration en g [0, 5].
         """
         ManualValidator.validate("vibration", value)
-        self.motor.vibration = float(value)
+        if self.is_manual():
+            self.motor.manual_override["vibration"] = float(value)
+        else:
+            self.motor.vibration = float(value)
         logger.debug("[ManualController] vibration → %.3f g", value)
 
     def set_current(self, value: float) -> None:
@@ -122,7 +159,10 @@ class ManualController:
             value: Courant en A [0, 30].
         """
         ManualValidator.validate("current", value)
-        self.motor.current = float(value)
+        if self.is_manual():
+            self.motor.manual_override["current"] = float(value)
+        else:
+            self.motor.current = float(value)
         logger.debug("[ManualController] current → %.2f A", value)
 
     def set_speed(self, value: float) -> None:
@@ -133,7 +173,10 @@ class ManualController:
             value: Vitesse en rpm [0, 3000].
         """
         ManualValidator.validate("speed", value)
-        self.motor.speed = float(value)
+        if self.is_manual():
+            self.motor.manual_override["speed"] = float(value)
+        else:
+            self.motor.speed = float(value)
         logger.debug("[ManualController] speed → %.1f rpm", value)
 
     def set_torque(self, value: float) -> None:
@@ -144,7 +187,10 @@ class ManualController:
             value: Couple en N.m [0, 200].
         """
         ManualValidator.validate("torque", value)
-        self.motor.torque = float(value)
+        if self.is_manual():
+            self.motor.manual_override["torque"] = float(value)
+        else:
+            self.motor.torque = float(value)
         logger.debug("[ManualController] torque → %.2f N.m", value)
 
     def set_wear(self, value: float) -> None:
@@ -282,6 +328,7 @@ class ManualController:
         self.motor.current            = _MOTOR_DEFAULTS["current"]
         self.motor.torque             = _MOTOR_DEFAULTS["torque"]
         self.motor.vibration          = _MOTOR_DEFAULTS["vibration"]
+        self.clear_overrides()
 
         # Restaurer l'état de marche et le runtime
         self.motor.running = was_running
