@@ -129,6 +129,25 @@ def latest_sensor(request):
         sensor_data=sensor_data,
     )
 
+    # --- AUTOMATIC ALERT CREATION HOOK ---
+    status = payload.get("maintenance", {}).get("status", "NORMAL")
+    if status != "NORMAL":
+        fault = payload.get("maintenance", {}).get("fault", "Unknown")
+        alert_msg = payload.get("maintenance", {}).get("alert", {}).get("message", "Fault detected")
+        
+        from maintenance.models import Alert
+        last_alert = Alert.objects.first()
+        
+        # We create a new alert only if the fault type or urgency changed, to prevent DB spam
+        if not last_alert or last_alert.fault_type != fault or last_alert.urgency != status:
+            Alert.objects.create(
+                title=f"Maintenance Alert: {status}",
+                message=alert_msg,
+                urgency=status,
+                fault_type=fault
+            )
+    # ---------------------------------------
+
     history = []
     for item in reversed(recent_measurements):
         item_data = SensorDataSerializer(item).data

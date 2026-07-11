@@ -1,6 +1,17 @@
-"""Fault injection helper for the motor digital twin."""
+"""
+Fault injector.
 
-from __future__ import annotations
+Ne modifie JAMAIS :
+
+- température
+- courant
+- vitesse
+- couple
+- vibration
+
+Ces valeurs sont recalculées uniquement
+par Physics.
+"""
 
 from dataclasses import dataclass
 from typing import Any
@@ -8,159 +19,220 @@ from typing import Any
 from .scenarios import FAULT_SCENARIOS
 
 
-def _clamp(value: float, minimum: float, maximum: float) -> float:
-    return max(minimum, min(maximum, value))
+def clamp(value, mini, maxi):
+    return max(mini, min(value, maxi))
 
 
 @dataclass
 class FaultInjector:
-    """Apply controlled fault drift to the motor internal state.
-
-    The injector only modifies the allowed internal state variables. It never
-    touches derived physical values such as temperature, current, speed,
-    torque, or vibration. Those are recomputed later by the physics layer.
-    """
 
     current_fault: str = "NORMAL"
+
     active: bool = False
+
     cycles: int = 0
 
-    def activate(self, name: str) -> None:
-        """Enable a named fault scenario.
+    # ====================================================
+    # Activer une panne
+    # ====================================================
 
-        Parameters
-        ----------
-        name:
-            Scenario name as defined in ``FAULT_SCENARIOS``.
-        """
+    def activate(self, fault):
 
-        normalized_name = name.upper()
-        if normalized_name not in FAULT_SCENARIOS:
-            raise ValueError(f"Unknown fault scenario: {name}")
+        fault = fault.upper()
 
-        self.current_fault = normalized_name
-        self.active = normalized_name != "NORMAL"
+        if fault not in FAULT_SCENARIOS:
+            raise ValueError(f"Unknown fault {fault}")
+
+        self.current_fault = fault
+
+        self.active = fault != "NORMAL"
+
         self.cycles = 0
 
-    def deactivate(self) -> None:
-        """Disable fault injection and return to normal mode."""
+    # ====================================================
+    # Désactiver
+    # ====================================================
+
+    def deactivate(self):
 
         self.reset()
 
-    def update(self, motor: Any) -> Any:
-        """Apply the active scenario drift to the provided motor.
+    # ====================================================
+    # Mise à jour
+    # ====================================================
 
-        The motor instance is mutated in place, but only through the allowed
-        internal state variables.
-        """
+    def update(self, motor):
 
-        if not self.active or self.current_fault == "NORMAL":
+        if not self.active:
             return motor
 
         scenario = FAULT_SCENARIOS[self.current_fault]
-        multiplier = 3.0 if self.cycles == 0 else 1.0
 
-        self._apply_delta(
+        # ------------------------------------------------
+        # IMPORTANT
+        #
+        # Plus cette valeur est grande,
+        # plus la panne devient exponentielle.
+        #
+        # 0.02 = lent
+        # 0.05 = normal
+        # 0.10 = rapide
+        # 0.15 = démonstration
+        # ------------------------------------------------
+
+        acceleration = 1 + (self.cycles * 0.12)
+
+        self.apply(
             motor,
             "load",
-            scenario.get("load", 0.0) * multiplier,
-            0.0,
-            100.0,
+            scenario.get("load", 0) * acceleration,
+            0,
+            100,
         )
-        self._apply_delta(
+
+        self.apply(
             motor,
             "wear",
-            scenario.get("wear", 0.0) * multiplier,
-            0.0,
-            100.0,
+            scenario.get("wear", 0) * acceleration,
+            0,
+            100,
         )
-        self._apply_delta(
+
+        self.apply(
             motor,
             "misalignment",
-            scenario.get("misalignment", 0.0) * multiplier,
-            0.0,
-            100.0,
+            scenario.get("misalignment", 0) * acceleration,
+            0,
+            100,
         )
-        self._apply_delta(
+
+        self.apply(
             motor,
             "cooling_efficiency",
-            scenario.get("cooling_efficiency", 0.0) * multiplier,
-            0.0,
-            100.0,
+            scenario.get("cooling_efficiency", 0) * acceleration,
+            0,
+            100,
         )
+
         self.cycles += 1
 
         return motor
 
-    def kick(self, motor: Any) -> Any:
-        """Apply an immediate visible impact when the operator selects a fault."""
+    # ====================================================
+    # Impact immédiat
+    # ====================================================
 
-        if not self.active or self.current_fault == "NORMAL":
+    def kick(self, motor):
+
+        if not self.active:
             return motor
 
-        scenario = FAULT_SCENARIOS[self.current_fault]
-        shock_map = {
-            "BEARING_WEAR": {"wear": 8.0, "misalignment": 4.0},
-            "COOLING_FAILURE": {"cooling_efficiency": 15.0},
-            "MOTOR_OVERLOAD": {"load": 15.0},
-            "ROTOR_MISALIGNMENT": {"misalignment": 10.0},
-            "ELECTRICAL_FAULT": {"load": 8.0, "misalignment": 4.0},
-            "POWER_LOSS": {"load": 20.0},
-        }
-        shock = shock_map.get(self.current_fault, {})
+        # ------------------------------------------------
+        # Le kick rend la panne visible
+        # immédiatement après son activation.
+        #
+        # Modifier uniquement ces valeurs
+        # si l'on veut une apparition plus ou moins brutale.
+        # ------------------------------------------------
 
-        self._apply_delta(
+        shock = {
+
+            "BEARING_WEAR": {
+
+                "wear": 35,
+
+                "misalignment": 10,
+            },
+
+            "COOLING_FAILURE": {
+
+                "cooling_efficiency": -55,
+            },
+
+            "MOTOR_OVERLOAD": {
+
+                "load": 40,
+            },
+
+            "ROTOR_MISALIGNMENT": {
+
+                "misalignment": 30,
+            },
+
+            "ELECTRICAL_FAULT": {
+
+                "load": 25,
+
+                "misalignment": 15,
+            },
+
+            "POWER_LOSS": {
+
+                "load": -45,
+            },
+        }
+
+        config = shock.get(self.current_fault, {})
+
+        self.apply(
             motor,
             "load",
-            scenario.get("load", 0.0) * shock.get("load", 5.0),
-            0.0,
-            100.0,
+            config.get("load", 0),
+            0,
+            100,
         )
-        self._apply_delta(
+
+        self.apply(
             motor,
             "wear",
-            scenario.get("wear", 0.0) * shock.get("wear", 5.0),
-            0.0,
-            100.0,
+            config.get("wear", 0),
+            0,
+            100,
         )
-        self._apply_delta(
+
+        self.apply(
             motor,
             "misalignment",
-            scenario.get("misalignment", 0.0) * shock.get("misalignment", 5.0),
-            0.0,
-            100.0,
+            config.get("misalignment", 0),
+            0,
+            100,
         )
-        self._apply_delta(
+
+        self.apply(
             motor,
             "cooling_efficiency",
-            scenario.get("cooling_efficiency", 0.0) * shock.get("cooling_efficiency", 10.0),
-            0.0,
-            100.0,
+            config.get("cooling_efficiency", 0),
+            0,
+            100,
         )
 
         if self.current_fault == "POWER_LOSS":
-            setattr(motor, "running", False)
+            motor.running = False
 
         return motor
 
-    def reset(self) -> None:
-        """Clear the active fault and restore normal operation."""
+    # ====================================================
+
+    def reset(self):
 
         self.current_fault = "NORMAL"
+
         self.active = False
+
         self.cycles = 0
 
+    # ====================================================
+
     @staticmethod
-    def _apply_delta(
-        motor: Any,
-        attribute: str,
-        delta: float,
-        minimum: float,
-        maximum: float,
-    ) -> None:
+    def apply(motor, field, delta, mini, maxi):
+
         if delta == 0:
             return
 
-        current_value = float(getattr(motor, attribute, 0.0))
-        updated_value = _clamp(current_value + delta, minimum, maximum)
-        setattr(motor, attribute, updated_value)
+        value = getattr(motor, field)
+
+        setattr(
+            motor,
+            field,
+            clamp(value + delta, mini, maxi)
+        )

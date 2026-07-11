@@ -1,204 +1,315 @@
 const Charts = (() => {
+  const MAX_POINTS = 50; // Ajusté pour un rendu visuel aéré comme sur l'image
 
-    const MAX_POINTS = 100;
+  const history = {
+    labels: [],
+    temperature: [],
+    vibration: [],
+    current: [],
+    speed: [],
+    torque: [],
+    health: [],
+  };
 
-    const history = {
-        labels: [],
-        temperature: [],
-        vibration: [],
-        current: [],
-        speed: [],
-        torque: [],
-        health: [],
-    };
+  let currentVariable = "temperature";
+  let canvas = null;
+  let context = null;
 
-    let currentVariable = "temperature";
-    let canvas = null;
-    let context = null;
+  // Palette "Dark Neon"
+  const styleConfig = {
+    bg: "#0f172a", // Fond slate-900 (pour correspondre au HTML)
+    grid: "rgba(255, 255, 255, 0.12)", // Grille subtile
+    text: "#cbd5e1", // Texte clair
+    gradientBottom: "rgba(15, 23, 42, 0.0)", // Transparent
+  };
 
-    const colors = {
-        temperature: "#ef4444",
-        vibration: "#eab308",
-        current: "#22c55e",
-        speed: "#3b82f6",
-        torque: "#8b5cf6",
-        health: "#06b6d4",
-    };
+  // Couleurs dynamiques selon la variable sélectionnée
+  const dynamicColors = {
+    temperature: { line: "#fb7185", glow: "rgba(251, 113, 133, 0.6)" }, // Rose
+    vibration: { line: "#fbbf24", glow: "rgba(251, 191, 36, 0.6)" }, // Amber
+    current: { line: "#34d399", glow: "rgba(52, 211, 153, 0.6)" }, // Menthe
+    speed: { line: "#60a5fa", glow: "rgba(96, 165, 250, 0.6)" }, // Bleu
+    torque: { line: "#a78bfa", glow: "rgba(167, 139, 250, 0.6)" }, // Violet
+    health: { line: "#22d3ee", glow: "rgba(34, 211, 238, 0.6)" }, // Cyan
+  };
 
-    const labels = {
-        temperature: "Temperature",
-        vibration: "Vibration",
-        current: "Current",
-        speed: "Speed",
-        torque: "Torque",
-        health: "Health",
-    };
+  const labels = {
+    temperature: "Température (°C)",
+    vibration: "Vibration (mm/s)",
+    current: "Courant (A)",
+    speed: "Vitesse (RPM)",
+    torque: "Couple (Nm)",
+    health: "Santé (%)",
+  };
 
-    function init() {
-        canvas = document.getElementById("mainChart");
-        if (!canvas) {
-            return;
-        }
+  // Marges pour l'encadrement de la grille et les libellés
+  const padding = { top: 35, right: 30, bottom: 45, left: 55 };
 
-        context = canvas.getContext("2d");
-        resize();
-        draw();
+  function init() {
+    canvas = document.getElementById("mainChart");
+    if (!canvas) return;
 
-        const selector = document.getElementById("chartSelector");
-        if (selector) {
-            selector.addEventListener("change", function () {
-                change(this.value);
-            });
-        }
+    context = canvas.getContext("2d");
+    resize();
 
-        window.addEventListener("resize", resize);
+    const selector = document.getElementById("chartSelector");
+    if (selector) {
+      selector.addEventListener("change", function () {
+        change(this.value);
+      });
     }
 
-    function resize() {
-        if (!canvas || !context) {
-            return;
-        }
+    window.addEventListener("resize", resize);
+  }
 
-        const parent = canvas.parentElement;
-        const width = parent ? parent.clientWidth : canvas.clientWidth;
-        const height = parent ? parent.clientHeight : 320;
-        const ratio = window.devicePixelRatio || 1;
+  function resize() {
+    if (!canvas || !context) return;
 
-        canvas.width = Math.max(width * ratio, 300);
-        canvas.height = Math.max(height * ratio, 220);
-        canvas.style.width = `${Math.max(width, 300)}px`;
-        canvas.style.height = `${Math.max(height, 220)}px`;
-        context.setTransform(ratio, 0, 0, ratio, 0, 0);
-        draw();
+    const parent = canvas.parentElement;
+    const width = parent ? parent.clientWidth : 700;
+    const height = parent ? parent.clientHeight : 350;
+    const ratio = window.devicePixelRatio || 1;
+
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    draw();
+  }
+
+  function push(data) {
+    const now = new Date();
+    history.labels.push(now.getTime());
+    history.temperature.push(Number(data.temperature || 0));
+    history.vibration.push(Number(data.vibration || 0));
+    history.current.push(Number(data.current || 0));
+    history.speed.push(Number(data.speed || 0));
+    history.torque.push(Number(data.torque || 0));
+    history.health.push(Number(data.health || 0));
+
+    if (history.labels.length > MAX_POINTS) {
+      Object.keys(history).forEach((key) => history[key].shift());
     }
 
-    function push(data) {
-        const now = new Date();
+    draw();
+  }
 
-        history.labels.push(now.toLocaleTimeString());
-        history.temperature.push(Number(data.temperature || 0));
-        history.vibration.push(Number(data.vibration || 0));
-        history.current.push(Number(data.current || 0));
-        history.speed.push(Number(data.speed || 0));
-        history.torque.push(Number(data.torque || 0));
-        history.health.push(Number(data.health || 0));
+  function change(variable) {
+    currentVariable = variable in history ? variable : "temperature";
+    draw();
+  }
 
-        if (history.labels.length > MAX_POINTS) {
-            history.labels.shift();
-            history.temperature.shift();
-            history.vibration.shift();
-            history.current.shift();
-            history.speed.shift();
-            history.torque.shift();
-            history.health.shift();
-        }
+  function getScales(values, width, height) {
+    const plotWidth = width - padding.left - padding.right;
+    const plotHeight = height - padding.top - padding.bottom;
 
-        draw();
-    }
-
-    function change(variable) {
-        currentVariable = variable in history ? variable : "temperature";
-        draw();
-    }
-
-    function drawGrid(width, height) {
-        context.strokeStyle = "#1e293b";
-        context.lineWidth = 1;
-
-        for (let i = 0; i <= 5; i += 1) {
-            const y = 20 + ((height - 50) / 5) * i;
-            context.beginPath();
-            context.moveTo(40, y);
-            context.lineTo(width - 10, y);
-            context.stroke();
-        }
-    }
-
-    function drawLine(values, width, height) {
-        if (!values.length) {
-            return;
-        }
-
-        const plotWidth = width - 60;
-        const plotHeight = height - 50;
-        const minValue = Math.min(...values, 0);
-        const maxValue = Math.max(...values, 1);
-        const range = Math.max(maxValue - minValue, 1);
-        const stepX = values.length > 1 ? plotWidth / (values.length - 1) : plotWidth;
-
-        context.strokeStyle = colors[currentVariable];
-        context.lineWidth = 3;
-        context.beginPath();
-
-        values.forEach((value, index) => {
-            const x = 40 + stepX * index;
-            const normalized = (value - minValue) / range;
-            const y = 20 + plotHeight - normalized * plotHeight;
-
-            if (index === 0) {
-                context.moveTo(x, y);
-            } else {
-                context.lineTo(x, y);
-            }
-        });
-
-        context.stroke();
-    }
-
-    function drawLegend(width) {
-        context.fillStyle = "#e2e8f0";
-        context.font = "600 14px Inter, sans-serif";
-        context.fillText(labels[currentVariable], 44, 18);
-
-        context.fillStyle = colors[currentVariable];
-        context.fillRect(width - 140, 8, 10, 10);
-        context.fillStyle = "#e2e8f0";
-        context.font = "12px Inter, sans-serif";
-        context.fillText("Live signal", width - 124, 17);
-    }
-
-    function drawEmpty(width, height) {
-        context.fillStyle = "#94a3b8";
-        context.font = "14px Inter, sans-serif";
-        context.fillText("Waiting for live measurements...", 50, height / 2);
-    }
-
-    function draw() {
-        if (!canvas || !context) {
-            return;
-        }
-
-        const width = canvas.clientWidth || 900;
-        const height = canvas.clientHeight || 320;
-
-        context.clearRect(0, 0, width, height);
-        context.fillStyle = "#0f172a";
-        context.fillRect(0, 0, width, height);
-
-        drawGrid(width, height);
-        drawLegend(width);
-
-        const values = history[currentVariable];
-        if (!values.length) {
-            drawEmpty(width, height);
-            return;
-        }
-
-        drawLine(values, width, height);
-    }
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-    } else {
-        init();
-    }
+    const minVal = Math.min(...values, 0);
+    const maxVal = Math.max(...values, 10);
+    const padY = (maxVal - minVal) * 0.15 || 5;
 
     return {
-        push,
-        change,
-        draw,
+      minY: Math.floor(minVal),
+      maxY: Math.ceil(maxVal + padY),
+      plotWidth,
+      plotHeight,
     };
+  }
 
+  function drawGridAndAxes(width, height, minY, maxY, plotWidth, plotHeight) {
+    context.strokeStyle = styleConfig.grid;
+    context.lineWidth = 1;
+    context.fillStyle = styleConfig.text;
+    context.font = "600 11px 'Inter', sans-serif";
+    context.textBaseline = "middle";
+
+    const gridRows = 5;
+    const gridCols = 8;
+
+    // 1. Lignes horizontales + Libellés Y (Gauche)
+    context.textAlign = "right";
+    for (let i = 0; i <= gridRows; i++) {
+      const ratio = i / gridRows;
+      const y = padding.top + plotHeight * (1 - ratio);
+      const val = minY + (maxY - minY) * ratio;
+
+      context.beginPath();
+      context.moveTo(padding.left, y);
+      context.lineTo(width - padding.right, y);
+      context.stroke();
+
+      context.fillText(Math.round(val), padding.left - 12, y);
+    }
+
+    // 2. Lignes verticales + Libellés X (Bas en secondes)
+    context.textAlign = "center";
+    context.textBaseline = "top";
+    for (let i = 0; i <= gridCols; i++) {
+      const ratio = i / gridCols;
+      const x = padding.left + plotWidth * ratio;
+
+      context.beginPath();
+      context.moveTo(x, padding.top);
+      context.lineTo(x, padding.top + plotHeight);
+      context.stroke();
+
+      const secAgo = Math.round((1 - ratio) * 20);
+      const labelX = secAgo === 0 ? "MAINTENANT" : `-${secAgo}s`;
+      context.fillText(labelX, x, padding.top + plotHeight + 14);
+    }
+
+    // 3. Encadrement extérieur de la grille (Box)
+    context.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    context.strokeRect(padding.left, padding.top, plotWidth, plotHeight);
+  }
+
+  // Générateur de courbe lissée (Catmull-Rom vers Bézier)
+  function traceSmoothPath(points) {
+    context.beginPath();
+    context.moveTo(points[0].x, points[0].y);
+
+    const tension = 0.3;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i === 0 ? i : i - 1];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
+
+      const cp1x = p1.x + (p2.x - p0.x) * tension;
+      const cp1y = p1.y + (p2.y - p0.y) * tension;
+      const cp2x = p2.x - (p3.x - p1.x) * tension;
+      const cp2y = p2.y - (p3.y - p1.y) * tension;
+
+      context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+  }
+
+  function drawLineAndArea(values, plotWidth, plotHeight, minY, maxY) {
+    if (values.length < 2) return;
+
+    const stepX = plotWidth / (values.length - 1);
+    const rangeY = maxY - minY || 1;
+
+    const points = values.map((val, idx) => ({
+      x: padding.left + stepX * idx,
+      y: padding.top + plotHeight - ((val - minY) / rangeY) * plotHeight,
+      val: val,
+    }));
+
+    // 1. Dégradé sous la courbe (Area)
+    const activeColor = dynamicColors[currentVariable];
+    const gradient = context.createLinearGradient(
+      0,
+      padding.top,
+      0,
+      padding.top + plotHeight,
+    );
+    gradient.addColorStop(0, activeColor.glow);
+    gradient.addColorStop(1, styleConfig.gradientBottom);
+
+    traceSmoothPath(points);
+    context.lineTo(points[points.length - 1].x, padding.top + plotHeight);
+    context.lineTo(points[0].x, padding.top + plotHeight);
+    context.closePath();
+    context.fillStyle = gradient;
+    context.fill();
+
+    // 2. Trait principal
+    traceSmoothPath(points);
+    context.strokeStyle = activeColor.line;
+    context.lineWidth = 3.5;
+    context.lineJoin = "round";
+    context.lineCap = "round";
+    context.shadowColor = activeColor.glow;
+    context.shadowBlur = 10;
+    context.stroke();
+    context.shadowBlur = 0; // Reset ombre
+
+    // 3. Dessin du marqueur de Pic (Badge sur la valeur maximale)
+    let maxPoint = points[0];
+    points.forEach((p) => {
+      if (p.val > maxPoint.val) maxPoint = p;
+    });
+
+    drawPeakMarker(maxPoint.x, maxPoint.y);
+  }
+
+  function drawPeakMarker(x, y) {
+    const activeColor = dynamicColors[currentVariable];
+
+    // Halo extérieur
+    context.beginPath();
+    context.arc(x, y, 14, 0, Math.PI * 2);
+    context.fillStyle = activeColor.glow;
+    context.fill();
+
+    // Cercle intermédiaire
+    context.beginPath();
+    context.arc(x, y, 8, 0, Math.PI * 2);
+    context.fillStyle = activeColor.line;
+    context.fill();
+
+    // Point central blanc
+    context.beginPath();
+    context.arc(x, y, 3.5, 0, Math.PI * 2);
+    context.fillStyle = "#ffffff";
+    context.fill();
+  }
+
+  function drawEmpty(width, height) {
+    context.fillStyle = "#8b5cf6";
+    context.font = "14px Inter, sans-serif";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(
+      "En attente de la télémétrie en temps réel...",
+      width / 2,
+      height / 2,
+    );
+  }
+
+  function draw() {
+    if (!canvas || !context) return;
+
+    const width = canvas.width / (window.devicePixelRatio || 1);
+    const height = canvas.height / (window.devicePixelRatio || 1);
+
+    // Fond global sombre
+    context.fillStyle = styleConfig.bg;
+    context.fillRect(0, 0, width, height);
+
+    const values = history[currentVariable];
+    if (!values || !values.length) {
+      drawEmpty(width, height);
+      return;
+    }
+
+    const scales = getScales(values, width, height);
+    drawGridAndAxes(
+      width,
+      height,
+      scales.minY,
+      scales.maxY,
+      scales.plotWidth,
+      scales.plotHeight,
+    );
+    drawLineAndArea(
+      values,
+      scales.plotWidth,
+      scales.plotHeight,
+      scales.minY,
+      scales.maxY,
+    );
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  return { push, change, draw };
 })();
 
 window.Charts = Charts;

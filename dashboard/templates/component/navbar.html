@@ -1,32 +1,82 @@
-<section class="flex flex-col sm:flex-row justify-between gap-4 items-stretch p-6 rounded-[1.35rem] bg-gradient-to-br from-slate-900/95 to-slate-950/96 border border-slate-400/15 shadow-[0_24px_60px_rgba(0,0,0,0.28)]">
+<section
+  class="flex flex-col sm:flex-row justify-between gap-4 items-stretch p-6 rounded-[1.35rem] bg-white border border-slate-200 shadow-md"
+>
+  <div class="48">
+    <div>
+      <img
+        src="{{ 'https://tse1.mm.bing.net/th/id/OIP.hAkOVEDFbR4BTiMAVq0z_wHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'}}"
+        alt="Logo"
+        class="w-48"
+      />
+    </div>
+  </div>
   <div>
-    <p class="text-[0.72rem] uppercase tracking-[0.18em] text-slate-400">Industrial SCADA / Digital Twin</p>
-    <h2 class="mt-1 text-3xl xl:text-[2.3rem] font-black tracking-[0.02em] text-slate-50">Line de bouchonnage intelligente</h2>
-    <p class="mt-2 max-w-[60ch] text-slate-400">
-      Supervision temps réel, maintenance prédictive et état machine centralisés.
+    <p class="text-[0.72rem] uppercase tracking-[0.18em] text-slate-500">
+      SCADA industriel / jumeau numérique
+    </p>
+    <h2
+      class="mt-1 text-3xl xl:text-[2.3rem] font-black tracking-[0.02em] text-slate-900"
+    >
+      Ligne de bouchonnage intelligente
+    </h2>
+    <p class="mt-2 max-w-[60ch] text-slate-500">
+      Supervision temps réel, maintenance prédictive et état machine
+      centralisés.
     </p>
   </div>
 
   <div class="flex gap-[0.85rem] items-center flex-wrap">
-    <div class="flex items-center justify-between gap-3 px-4 py-[0.9rem] rounded-2xl bg-slate-900/72 border border-slate-400/15 min-w-[12rem]">
-      <span class="w-[0.9rem] h-[0.9rem] rounded-full bg-green-400 shadow-[0_0_18px_rgba(74,222,128,0.55),0_0_0_4px_rgba(255,255,255,0.04)] shrink-0" id="apiLed"></span>
+    <div
+      class="flex items-center justify-between gap-3 px-4 py-[0.9rem] rounded-2xl bg-slate-50 border border-slate-200 min-w-[12rem]"
+    >
+      <span
+        class="w-[0.9rem] h-[0.9rem] rounded-full bg-red-500 shadow-[0_0_12px_rgba(244,63,94,0.4)] shrink-0"
+        id="apiLed"
+      ></span>
       <div>
-        <small class="block text-[0.7rem] uppercase tracking-[0.08em] text-slate-400">API</small>
-        <strong class="text-[0.95rem] tracking-[0.08em]">CONNECTED</strong>
+        <small
+          class="block text-[0.7rem] uppercase tracking-[0.08em] text-slate-500"
+          >API</small
+        >
+        <strong class="text-[0.95rem] tracking-[0.08em] text-slate-800"
+          >DECONNECTE</strong
+        >
       </div>
     </div>
-    <div class="flex items-center justify-between gap-3 px-4 py-[0.9rem] rounded-2xl bg-slate-900/72 border border-slate-400/15 min-w-[12rem]">
-      <span class="w-[0.9rem] h-[0.9rem] rounded-full bg-rose-400 shadow-[0_0_18px_rgba(251,113,133,0.45),0_0_0_4px_rgba(255,255,255,0.04)] shrink-0" id="simLed"></span>
+    <div
+      class="flex items-center justify-between gap-3 px-4 py-[0.9rem] rounded-2xl bg-slate-50 border border-slate-200 min-w-[12rem]"
+    >
+      <span
+        class="w-[0.9rem] h-[0.9rem] rounded-full bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.4)] shrink-0"
+        id="simLed"
+      ></span>
       <div>
-        <small class="block text-[0.7rem] uppercase tracking-[0.08em] text-slate-400">Simulation</small>
-        <strong class="text-[0.95rem] tracking-[0.08em]" id="simStatus">STOPPED</strong>
+        <small
+          class="block text-[0.7rem] uppercase tracking-[0.08em] text-slate-500"
+          >Simulation</small
+        >
+        <strong
+          class="text-[0.95rem] tracking-[0.08em] text-slate-800"
+          id="simStatus"
+          >STOPPEE</strong
+        >
       </div>
     </div>
-    <div class="flex items-center justify-between gap-3 px-4 py-[0.9rem] rounded-2xl bg-slate-900/72 border border-slate-400/15 min-w-[12rem]">
-      <span class="w-[0.9rem] h-[0.9rem] rounded-full bg-green-400 shadow-[0_0_18px_rgba(74,222,128,0.55),0_0_0_4px_rgba(255,255,255,0.04)] shrink-0" id="motorLed"></span>
+    <div
+      class="flex items-center justify-between gap-3 px-4 py-[0.9rem] rounded-2xl bg-slate-50 border border-slate-200 min-w-[12rem]"
+    >
+      <span
+        class="w-[0.9rem] h-[0.9rem] rounded-full bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.4)] shrink-0"
+        id="motorLed"
+      ></span>
       <div>
-        <small class="block text-[0.7rem] uppercase tracking-[0.08em] text-slate-400">Moteur</small>
-        <strong class="text-[0.95rem] tracking-[0.08em]">RUNNING</strong>
+        <small
+          class="block text-[0.7rem] uppercase tracking-[0.08em] text-slate-500"
+          >Moteur</small
+        >
+        <strong class="text-[0.95rem] tracking-[0.08em] text-slate-800"
+          >EN MARCHE</strong
+        >
       </div>
     </div>
   </div>

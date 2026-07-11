@@ -35,7 +35,7 @@ const Simulation = (()=>{
 
         document
             .getElementById("simStatus")
-            .innerHTML="RUNNING";
+            .innerHTML="EN MARCHE";
 
     }
 
@@ -49,7 +49,7 @@ const Simulation = (()=>{
 
         document
             .getElementById("simStatus")
-            .innerHTML="STOPPED";
+            .innerHTML="STOPPÉE";
 
     }
 
@@ -67,7 +67,7 @@ const Simulation = (()=>{
         const data = await response.json();
 
         document.getElementById("faultStatus").innerHTML =
-            `Fault: ${data.fault_mode || fault}`;
+            `Défaut: ${data.fault_mode || fault}`;
 
         if (typeof DashboardAPI !== "undefined" && DashboardAPI.refresh) {
             DashboardAPI.refresh();

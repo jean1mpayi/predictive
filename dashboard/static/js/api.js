@@ -47,6 +47,10 @@ const DashboardAPI = (() => {
 
             updateStatus(payload);
 
+            if (typeof NotificationManager !== "undefined") {
+                NotificationManager.update(payload);
+            }
+
             const apiLed = document.getElementById("apiLed");
             if (apiLed) {
                 apiLed.classList.remove("bg-red-500");
@@ -93,7 +97,7 @@ const DashboardAPI = (() => {
         const motorLed = document.getElementById("motorLed");
 
         if(simStatus){
-            simStatus.innerHTML = simulation.running ? "RUNNING" : "STOPPED";
+            simStatus.innerHTML = simulation.running ? "EN MARCHE" : "STOPPÉE";
         }
 
         if(motorLed){
@@ -102,7 +106,7 @@ const DashboardAPI = (() => {
         }
 
         if(faultStatus){
-            faultStatus.innerHTML = `Fault: ${simulation.fault || "NORMAL"}`;
+            faultStatus.innerHTML = `Défaut: ${simulation.fault || "NORMAL"}`;
         }
     }
 

@@ -1,33 +1,83 @@
-"""Fault scenario knowledge base.
+"""
+Fault scenario knowledge base.
 
-This module intentionally contains only declarative data. It does not
-implement any behavior or decision logic.
+Les valeurs représentent la dégradation appliquée
+à CHAQUE cycle de simulation.
+
+Modifier uniquement les valeurs ci-dessous pour
+accélérer ou ralentir une panne.
 """
 
 from __future__ import annotations
 
+# ==========================================================
+# VITESSE DE DEGRADATION
+#
+# DEMO      -> 1 à 5 secondes
+# REALISTIC -> 30 à 120 secondes
+# INDUSTRY  -> plusieurs minutes
+#
+# Il suffit de modifier DEMO_FACTOR.
+# ==========================================================
 
-FAULT_SCENARIOS: dict[str, dict[str, float]] = {
+DEMO_FACTOR = 10
+
+FAULT_SCENARIOS = {
+
     "NORMAL": {},
+
+    # --------------------------------------------
+    # Roulements
+    # --------------------------------------------
     "BEARING_WEAR": {
-        "wear": 0.20,
-        "misalignment": 0.01,
+
+        # augmente l'usure
+        "wear": 2.0 * DEMO_FACTOR,
+
+        # augmente progressivement les vibrations
+        "misalignment": 0.30 * DEMO_FACTOR,
     },
+
+    # --------------------------------------------
+    # Refroidissement
+    # --------------------------------------------
     "COOLING_FAILURE": {
-        "cooling_efficiency": -0.50,
+
+        # fait chuter très vite le refroidissement
+        "cooling_efficiency": -4.0 * DEMO_FACTOR,
     },
+
+    # --------------------------------------------
+    # Surcharge
+    # --------------------------------------------
     "MOTOR_OVERLOAD": {
-        "load": 0.50,
+
+        # augmente rapidement la charge
+        "load": 3.5 * DEMO_FACTOR,
     },
+
+    # --------------------------------------------
+    # Désalignement rotor
+    # --------------------------------------------
     "ROTOR_MISALIGNMENT": {
-        "misalignment": 0.05,
+
+        "misalignment": 0.70 * DEMO_FACTOR,
     },
+
+    # --------------------------------------------
+    # Défaut électrique
+    # --------------------------------------------
     "ELECTRICAL_FAULT": {
-        "load": 0.20,
-        "misalignment": 0.02,
+
+        "load": 2.0 * DEMO_FACTOR,
+        "misalignment": 0.35 * DEMO_FACTOR,
     },
+
+    # --------------------------------------------
+    # Coupure alimentation
+    # --------------------------------------------
     "POWER_LOSS": {
-        "load": -1.00,
+
+        "load": -6.0 * DEMO_FACTOR,
     },
 }
-

@@ -1,18 +1,18 @@
 const History = (() => {
+  function update(items) {
+    const container = document.getElementById("history");
+    if (!container) {
+      return;
+    }
 
-    function update(items){
+    if (!items || items.length === 0) {
+      container.innerHTML = `<div class="text-slate-500">Aucune mesure pour le moment.</div>`;
+      return;
+    }
 
-        const container = document.getElementById("history");
-        if(!container){
-            return;
-        }
-
-        if(!items || items.length === 0){
-            container.innerHTML = `<div class="text-slate-400">No measurements yet</div>`;
-            return;
-        }
-
-        container.innerHTML = items.map(item => `
+    container.innerHTML = items
+      .map(
+        (item) => `
             <div class="history-row">
                 <div class="history-time">${item.timestamp || ""}</div>
                 <div class="history-values">
@@ -24,13 +24,14 @@ const History = (() => {
                     <span>H ${Number(item.health || 0).toFixed(1)}%</span>
                 </div>
             </div>
-        `).join("");
-    }
+        `,
+      )
+      .join("");
+  }
 
-    return {
-        update
-    };
-
+  return {
+    update,
+  };
 })();
 
 window.History = History;
