@@ -1,27 +1,27 @@
 def build_alert(health_value, probability):
     if probability > 80 or health_value < 50:
         return {
-            "status": "CRITICAL",
+            "status": "CRITIQUE",
             "color": "red",
             "icon": "🚨",
-            "priority": "HIGH",
-            "message": "Immediate maintenance required",
+            "priority": "ÉLEVÉ",
+            "message": "Maintenance immédiate requise",
         }
 
     if health_value < 80:
         return {
-            "status": "WARNING",
+            "status": "ATTENTION",
             "color": "orange",
             "icon": "⚠️",
-            "priority": "MEDIUM",
-            "message": "Degradation detected, monitor the asset",
+            "priority": "MOYEN",
+            "message": "Dégradation détectée, surveiller l’équipement",
         }
 
     return {
         "status": "NORMAL",
         "color": "green",
         "icon": "✅",
-        "priority": "LOW",
-        "message": "Asset operating normally",
+        "priority": "FAIBLE",
+        "message": "L’équipement fonctionne normalement",
     }
 
